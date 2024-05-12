@@ -12,7 +12,29 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_DEFAULT_PLATFORM: "linux/x86_64"
+      version: "24.04"
+
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: ls -lt
+      run: |
+        python3 build.py \
+          --repo-tag=common:r$version \
+          --repo-tag=core:r$version \
+          --repo-tag=backend:r$version \
+          --repoagent=checksum:r$version \
+          --enable-logging \
+          --enable-stats \
+          --enable-tracing \
+          --target-machine=x86_64 \
+          --enable-cpu-metrics \
+          --filesystem gcs \
+          --filesystem aws \
+          --verbose \
+          --enable-metrics \
+          --endpoint=grpc \
+          --endpoint=http \
+          --backend=onnx:r$version \
+          --backend=python:r$version
